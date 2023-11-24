@@ -23,7 +23,7 @@ if (localItem) {
 
 
 
-if (window.location.href == 'http://127.0.0.1:5500/index.html') {
+if (window.location.href == 'https://ness1999.github.io/Fake-shop/index.html') {
     const row = document.querySelector('.row')
 
 
@@ -131,7 +131,7 @@ if (window.location.href == 'http://127.0.0.1:5500/index.html') {
         row.append(col)
 
     })
-} else if (window.location.href == 'http://127.0.0.1:5500/sepet.html') {
+} else if (window.location.href == 'https://ness1999.github.io/Fake-shop/sepet.html') {
     const container = document.querySelector('.container')
 
     if (sepet.length == 0) {
