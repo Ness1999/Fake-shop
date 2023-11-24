@@ -1,32 +1,56 @@
 const span = document.querySelector('#span')
-// const row = document.querySelector('.row')
 
 
 let sepet = []
 
 let localItem = localStorage.getItem('sepet')
+ 
+let toplamSepet=0
 
 if (localItem) {
     sepet = JSON.parse(localItem)
-    // console.log(sepet)
-    span.textContent = sepet.length
-}
-// localStorage.clear()
-// console.log(urunler)
+    sepet.forEach (urun =>{
+        toplamSepet+=urun.quantity
+    })
 
-console.log(window.location.href)
-console.log(sepet.length)
+    if (sepet.length==0) {
+        span.textContent=''
+    } else {
+        span.textContent = toplamSepet
+    }
+    
+}
+
+
 
 if (window.location.href == 'http://127.0.0.1:5500/index.html') {
     const row = document.querySelector('.row')
 
+
+    //! arama kodu
+    const input = document.getElementById('input')
+
+    input.addEventListener('input',(element)=>{
+        console.log(element.target.value.toLowerCase())
+        let kullaniciDeger = element.target.value.toLowerCase()
+        const col = document.querySelectorAll('.col-12')
+        for (let i=0 ; i<col.length ; i++){
+            // console.log(col[i].firstChild.firstChild.nextSibling.firstChild.textContent)
+            let urunAdi = col[i].firstChild.firstChild.nextSibling.firstChild.textContent.toLowerCase()
+            let urunAciklama = col[i].firstChild.firstChild.nextSibling.firstChild.nextSibling.textContent.toLowerCase()
+
+
+            if (urunAdi.indexOf(kullaniciDeger) != -1 || urunAciklama.indexOf(kullaniciDeger)!= -1) {
+                col[i].style.display='flex'
+            } else {
+                col[i].style.display='none'
+            }
+        }
+    })
+
+
     urunler.forEach((urun) => {
-
-        // console.log(urun)
-
         urun.quantity = 1
-
-        // console.log(urun)
 
         const col = document.createElement('div')
         col.classList.add('col-lg-3', 'col-sm-6', 'col-12')
@@ -84,8 +108,13 @@ if (window.location.href == 'http://127.0.0.1:5500/index.html') {
                 sepet.push(urun)
             }
 
+            let toplam = 0
+            sepet.forEach(element => {
+                toplam+= element.quantity
+            })
+
             localStorage.setItem('sepet', JSON.stringify(sepet))
-            span.textContent = sepet.length
+            span.textContent = toplam
         })
 
         cardBody.append(baslik)
@@ -133,7 +162,7 @@ if (window.location.href == 'http://127.0.0.1:5500/index.html') {
 
             const price = document.createElement('p')
             let urununFiyati = urun.fiyat * urun.quantity
-            price.textContent = urununFiyati + '$'
+            price.textContent = urununFiyati.toFixed(2) + '$'
             price.style.fontWeight = 'bold'
 
             const kacTane = document.createElement('div')
@@ -156,7 +185,9 @@ if (window.location.href == 'http://127.0.0.1:5500/index.html') {
                 if (urun.quantity >= 1) {
                     urun.quantity--
                     sayi.textContent = urun.quantity
+                    price.textContent=(urun.fiyat*urun.quantity).toFixed('2')+'$'
 
+                    localStorage.setItem('sepet',JSON.stringify(sepet))
 
                     if (urun.quantity == 0) {
                         // console.log(this.parentElement.parentElement)
@@ -171,16 +202,54 @@ if (window.location.href == 'http://127.0.0.1:5500/index.html') {
                         //! LocalStorage'dan silme
 
                     }
+
+                    let toplam=0
+                    sepet.forEach(e=> {
+                        toplam+=e.quantity
+                    })
+
+                    if (sepet.length==0) {
+                        span.textContent=''
+                    } else {
+                        span.textContent = toplam
+                    }
                 }
+
+                if (sepet.length == 0) {
+                    const h4 = document.createElement('h4')
+                    h4.textContent = 'Sepetinizde Ürün Kalmamistir...'
+            
+                    container.append(h4)
+                    container.removeChild(hr)
+                }
+
+                let toplamSepetFiyati = 0
+                sepet.forEach(e=> {
+                    toplamSepetFiyati+= e.fiyat*e.quantity
+                })
+                sepetFiyat.textContent=toplamSepetFiyati.toFixed(2)+'$'
             })
 
             arttirBtn.addEventListener('click', () => {
                 urun.quantity++
                 sayi.textContent = urun.quantity
+                price.textContent=(urun.fiyat*urun.quantity).toFixed('2')+'$'
 
-                // urun.fiyat += urun.quantity
-                // price.textContent = urun.fiyat
+                localStorage.setItem('sepet',JSON.stringify(sepet))
 
+                
+                let toplam=0
+                sepet.forEach(e=> {
+                    toplam+=e.quantity
+                })
+
+                span.textContent=toplam
+
+                let toplamSepetFiyati = 0
+                sepet.forEach(e=> {
+                    toplamSepetFiyati+= e.fiyat*e.quantity
+                })
+                sepetFiyat.textContent=toplamSepetFiyati.toFixed(2)+'$'
             })
 
             imgDiv.append(img)
@@ -196,9 +265,33 @@ if (window.location.href == 'http://127.0.0.1:5500/index.html') {
 
             container.append(div)
 
+
         })
 
-    }
+        const hr = document.createElement('hr')
+        container.appendChild(hr)
 
+        const fiyatDiv = document.createElement('div')
+        fiyatDiv.classList.add('w-100','d-flex','justify-content-around')
+
+        let sepetFiyat = document.createElement('h3')
+
+        let toplamSepetFiyati = 0
+        sepet.forEach(e=> {
+            toplamSepetFiyati+=e.fiyat*e.quantity
+        })
+
+        sepetFiyat.textContent=toplamSepetFiyati.toFixed(2) 
+
+
+        const sepetBtn = document.createElement('button')
+        sepetBtn.classList.add('btn','btn-dark','w-50')
+        sepetBtn.textContent='Satin Al'
+
+
+        fiyatDiv.append(sepetFiyat)
+        fiyatDiv.append(sepetBtn)
+        container.append(fiyatDiv)
+    }
 }
 // localStorage.clear()
